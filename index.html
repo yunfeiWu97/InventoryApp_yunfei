@@ -1,1 +1,273 @@
-Hello world!
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Inventory App</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+    h1, h2 {
+      margin-bottom: 0.5rem;
+    }
+    .error {
+      color: red;
+      margin: 0.5rem 0;
+    }
+    .success {
+      color: green;
+      margin: 0.5rem 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.4rem 0.5rem;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+    th {
+      background: #f5f5f5;
+    }
+    button {
+      cursor: pointer;
+    }
+    form {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem 1rem;
+      align-items: center;
+    }
+    form label {
+      font-size: 0.9rem;
+    }
+    form input {
+      padding: 0.3rem 0.4rem;
+      font-size: 0.9rem;
+    }
+    form button {
+      grid-column: 1 / -1;
+      padding: 0.4rem 0.8rem;
+    }
+    .small {
+      font-size: 0.8rem;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <h1>Inventory App</h1>
+
+  <p class="small">
+    Backend API base URL:
+    <code id="base-url-display"></code>
+  </p>
+
+  <div id="message"></div>
+
+  <button id="refresh-btn">Refresh items</button>
+
+  <table id="items-table">
+    <thead>
+      <tr>
+        <th>Item ID</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Qty</th>
+        <th>Price</th>
+        <th>Location ID</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- rows will be injected here -->
+    </tbody>
+  </table>
+
+  <h2>Add new item</h2>
+  <form id="add-form">
+    <label>
+      Name:
+      <input type="text" id="item_name" required />
+    </label>
+    <label>
+      Description:
+      <input type="text" id="item_description" required />
+    </label>
+    <label>
+      Quantity on hand:
+      <input type="number" id="item_qty_on_hand" required min="0" />
+    </label>
+    <label>
+      Price:
+      <input type="number" id="item_price" step="0.01" required min="0" />
+    </label>
+    <label>
+      Location ID:
+      <input type="number" id="location_id" required min="1" />
+    </label>
+    <span></span>
+    <button type="submit">Add item</button>
+  </form>
+
+  <script>
+    const BASE_URL = "https://2syji724o1.execute-api.us-east-1.amazonaws.com/prod";
+
+    document.getElementById("base-url-display").textContent = BASE_URL;
+
+    const messageDiv = document.getElementById("message");
+    const itemsTableBody = document.querySelector("#items-table tbody");
+    const refreshBtn = document.getElementById("refresh-btn");
+    const addForm = document.getElementById("add-form");
+
+    function showMessage(text, type = "success") {
+      messageDiv.textContent = text;
+      messageDiv.className = type === "error" ? "error" : "success";
+    }
+
+    function clearMessage() {
+      messageDiv.textContent = "";
+      messageDiv.className = "";
+    }
+
+    async function loadItems() {
+      clearMessage();
+      itemsTableBody.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
+
+      try {
+        const res = await fetch(`${BASE_URL}/item`, {
+          method: "GET"
+        });
+
+        if (!res.ok) {
+          throw new Error(`Request failed with status ${res.status}`);
+        }
+
+        const data = await res.json(); 
+        if (!Array.isArray(data)) {
+          throw new Error("Unexpected response format (not an array)");
+        }
+
+        if (data.length === 0) {
+          itemsTableBody.innerHTML = "<tr><td colspan='7'>No items found.</td></tr>";
+          return;
+        }
+
+        itemsTableBody.innerHTML = "";
+        data.forEach(item => {
+          const tr = document.createElement("tr");
+
+          tr.innerHTML = `
+            <td>${item.item_id}</td>
+            <td>${item.item_name}</td>
+            <td>${item.item_description}</td>
+            <td>${item.item_qty_on_hand}</td>
+            <td>${item.item_price}</td>
+            <td>${item.location_id}</td>
+            <td>
+              <button data-id="${item.item_id}">Delete</button>
+            </td>
+          `;
+
+          const deleteBtn = tr.querySelector("button");
+          deleteBtn.addEventListener("click", () => {
+            if (confirm(`Delete item ${item.item_id}?`)) {
+              deleteItem(item.item_id);
+            }
+          });
+
+          itemsTableBody.appendChild(tr);
+        });
+
+      } catch (err) {
+        console.error(err);
+        itemsTableBody.innerHTML = "<tr><td colspan='7'>Error loading items.</td></tr>";
+        showMessage(err.message || "Error loading items", "error");
+      }
+    }
+
+    async function deleteItem(itemId) {
+      clearMessage();
+
+      try {
+        const res = await fetch(`${BASE_URL}/item/${encodeURIComponent(itemId)}`, {
+          method: "DELETE"
+        });
+
+        if (!res.ok) {
+          throw new Error(`Delete failed with status ${res.status}`);
+        }
+
+        const data = await res.json(); // {"message": "...", "item": {...}}
+        showMessage(data.message || `Item ${itemId} deleted`);
+        await loadItems();
+      } catch (err) {
+        console.error(err);
+        showMessage(err.message || "Error deleting item", "error");
+      }
+    }
+
+    addForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearMessage();
+
+      const item_name = document.getElementById("item_name").value.trim();
+      const item_description = document.getElementById("item_description").value.trim();
+      const item_qty_on_hand = Number(document.getElementById("item_qty_on_hand").value);
+      const item_price = Number(document.getElementById("item_price").value);
+      const location_id = Number(document.getElementById("location_id").value);
+
+      if (!item_name || !item_description) {
+        showMessage("Name and description are required.", "error");
+        return;
+      }
+
+      if (Number.isNaN(item_qty_on_hand) || Number.isNaN(item_price) || Number.isNaN(location_id)) {
+        showMessage("Quantity, price and location must be numbers.", "error");
+        return;
+      }
+
+      const payload = {
+        item_name,
+        item_description,
+        item_qty_on_hand,
+        item_price,
+        location_id
+      };
+
+      try {
+        const res = await fetch(`${BASE_URL}/item`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          throw new Error(`Create failed with status ${res.status}`);
+        }
+
+        const data = await res.json(); 
+        showMessage(`Item created with id ${data.item_id || "(unknown id)"}`);
+
+        addForm.reset();
+        await loadItems();
+      } catch (err) {
+        console.error(err);
+        showMessage(err.message || "Error creating item", "error");
+      }
+    });
+
+    refreshBtn.addEventListener("click", loadItems);
+    loadItems();
+  </script>
+</body>
+</html>
