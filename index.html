@@ -4,191 +4,521 @@
   <meta charset="UTF-8" />
   <title>Inventory App</title>
   <style>
+    :root {
+      --bg: #f4f6fb;
+      --card-bg: #ffffff;
+      --primary: #2563eb;
+      --border: #e5e7eb;
+      --text-main: #111827;
+      --text-muted: #6b7280;
+      --radius-lg: 16px;
+      --radius-md: 10px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
+      margin: 0;
+      min-height: 100vh;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+      background: radial-gradient(circle at top, #e0ebff 0, #f4f6fb 40%, #f4f6fb 100%);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 3rem 1rem;
     }
-    h1, h2 {
-      margin-bottom: 0.5rem;
+
+    .app-shell {
+      width: 100%;
+      max-width: 1080px;
+      background: #ffffff;             
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.25);
     }
-    .error {
-      color: red;
-      margin: 0.5rem 0;
+
+    /* header：*/
+    .app-header {
+      padding: 1.5rem 2rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, #e0ecff, #f9fafb 55%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
     }
-    .success {
-      color: green;
-      margin: 0.5rem 0;
+
+    .header-main {
+      flex: 1 1 260px;
+      min-width: 0;
     }
+
+    h1 {
+      margin: 0;
+      font-size: 1.9rem;
+      letter-spacing: 0.03em;
+    }
+
+    .subtitle {
+      margin-top: 0.35rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .subtitle strong {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .base-url-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.6rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .base-url-pill span.label {
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .base-url-pill code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.78rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      background: #0f172a;
+      color: #e5e7eb;
+      max-width: 360px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .aws-logo {
+      height: 60px;
+      width: auto;
+      flex-shrink: 0;
+    }
+
+    .app-body {
+      padding: 1.5rem 2rem 2rem;
+      background: linear-gradient(to bottom, #ffffff, #f9fafb);
+    }
+
+  
+    .top-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    #message {
+      min-height: 1.4rem;
+      font-size: 0.9rem;
+    }
+
+    .tag-success,
+    .tag-error {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.15rem 0.7rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .tag-success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    .tag-error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.45rem 1.1rem;
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.16s ease-out;
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.25);
+    }
+
+    .btn span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #bfdbfe;
+    }
+
+    .btn:hover {
+      background: #1d4ed8;
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.32);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.12);
+      color: #b91c1c;
+      border-radius: 999px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.8rem;
+      border: 1px solid rgba(248, 113, 113, 0.4);
+      box-shadow: none;
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.12);
+      border-color: rgba(239, 68, 68, 0.7);
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      padding: 1rem 1rem 0.75rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.7rem;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 1rem;
+      border-radius: 12px;
+      overflow: hidden;
+      font-size: 0.86rem;
+      background: #ffffff;
     }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 0.4rem 0.5rem;
+
+    thead {
+      background: #f3f4ff;
+    }
+
+    th,
+    td {
+      padding: 0.55rem 0.7rem;
+      border-bottom: 1px solid #e5e7eb;
       text-align: left;
-      font-size: 0.9rem;
     }
+
     th {
-      background: #f5f5f5;
-    }
-    button {
-      cursor: pointer;
-    }
-    form {
-      margin-top: 1.5rem;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.6rem 1rem;
-      align-items: center;
-    }
-    form label {
-      font-size: 0.9rem;
-    }
-    form input {
-      padding: 0.3rem 0.4rem;
-      font-size: 0.9rem;
-    }
-    form button {
-      grid-column: 1 / -1;
-      padding: 0.4rem 0.8rem;
-    }
-    .small {
+      font-weight: 600;
       font-size: 0.8rem;
-      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: #4b5563;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    tbody tr:hover {
+      background: #eef2ff;
+    }
+
+    tbody td.actions {
+      width: 90px;
+      text-align: right;
+    }
+
+    .form-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1.1fr;
+      gap: 0.75rem 1.25rem;
+      align-items: center;
+      margin-top: 0.25rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 0.85rem;
+    }
+
+    .form-group label {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .form-row-span {
+      grid-column: 1 / -1;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      padding: 0.42rem 0.6rem;
+      border-radius: 999px;
+      border: 1px solid #d1d5db;
+      font-size: 0.9rem;
+      outline: none;
+      background: #f9fafb;
+      transition: all 0.12s ease-out;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus {
+      border-color: var(--primary);
+      background: #ffffff;
+      box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.5);
+    }
+
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+    }
+
+    @media (max-width: 768px) {
+      .app-body {
+        padding: 1.25rem 1.25rem 1.75rem;
+      }
+      .form-layout {
+        grid-template-columns: 1fr;
+      }
+      .card {
+        padding: 0.9rem 0.9rem 0.75rem;
+      }
+      .top-row {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+      }
+      .app-header {
+        padding: 1.25rem 1.5rem 1.1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>Inventory App</h1>
+  <div class="app-shell">
+    <div class="app-header">
+      <div class="header-main">
+        <h1>Inventory App</h1>
+        <p class="subtitle">
+          <strong>Serverless demo</strong> built with AWS Lambda, API Gateway, and DynamoDB.
+        </p>
+        <div class="base-url-pill">
+          <span class="label">API base URL</span>
+          <code id="base-url-display"></code>
+        </div>
+      </div>
+      <img src="Amazon_Web_Services_2025.svg.png" alt="AWS logo" class="aws-logo" />
+    </div>
 
-  <p class="small">
-    Backend API base URL:
-    <code id="base-url-display"></code>
-  </p>
+    <div class="app-body">
+      <div class="top-row">
+        <button id="refresh-btn" class="btn">
+          <span class="dot"></span>
+          Refresh items
+        </button>
+        <div id="message"></div>
+      </div>
 
-  <div id="message"></div>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Current inventory</div>
+            <div class="card-subtitle">Live data from DynamoDB via API Gateway + Lambda</div>
+          </div>
+        </div>
 
-  <button id="refresh-btn">Refresh items</button>
+        <table id="items-table">
+          <thead>
+            <tr>
+              <th>Item ID</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Location ID</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- rows will be injected here -->
+          </tbody>
+        </table>
+      </div>
 
-  <table id="items-table">
-    <thead>
-      <tr>
-        <th>Item ID</th>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Qty</th>
-        <th>Price</th>
-        <th>Location ID</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- rows will be injected here -->
-    </tbody>
-  </table>
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">Add new item</div>
+            <div class="card-subtitle">Quickly insert a new record into the inventory table</div>
+          </div>
+        </div>
 
-  <h2>Add new item</h2>
-  <form id="add-form">
-    <label>
-      Name:
-      <input type="text" id="item_name" required />
-    </label>
-    <label>
-      Description:
-      <input type="text" id="item_description" required />
-    </label>
-    <label>
-      Quantity on hand:
-      <input type="number" id="item_qty_on_hand" required min="0" />
-    </label>
-    <label>
-      Price:
-      <input type="number" id="item_price" step="0.01" required min="0" />
-    </label>
-    <label>
-      Location ID:
-      <input type="number" id="location_id" required min="1" />
-    </label>
-    <span></span>
-    <button type="submit">Add item</button>
-  </form>
+        <form id="add-form">
+          <div class="form-layout">
+            <div class="form-group">
+              <label for="item_name">Name</label>
+              <input type="text" id="item_name" required />
+            </div>
+
+            <div class="form-group">
+              <label for="item_description">Description</label>
+              <input type="text" id="item_description" required />
+            </div>
+
+            <div class="form-group">
+              <label for="item_qty_on_hand">Quantity on hand</label>
+              <input type="number" id="item_qty_on_hand" required min="0" />
+            </div>
+
+            <div class="form-group">
+              <label for="item_price">Price</label>
+              <input type="number" id="item_price" step="0.01" required min="0" />
+            </div>
+
+            <div class="form-group form-row-span">
+              <label for="location_id">Location ID</label>
+              <input type="number" id="location_id" required min="1" />
+            </div>
+
+            <div class="form-row-span">
+              <button type="submit" class="btn btn-full">
+                Add item
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <script>
     const BASE_URL = "https://2syji724o1.execute-api.us-east-1.amazonaws.com/prod";
 
-    document.getElementById("base-url-display").textContent = BASE_URL;
-
+    const baseUrlDisplay = document.getElementById("base-url-display");
     const messageDiv = document.getElementById("message");
     const itemsTableBody = document.querySelector("#items-table tbody");
     const refreshBtn = document.getElementById("refresh-btn");
     const addForm = document.getElementById("add-form");
 
-    function showMessage(text, type = "success") {
+    baseUrlDisplay.textContent = BASE_URL;
+
+    function showMessage(text, type) {
+      if (!text) {
+        messageDiv.textContent = "";
+        messageDiv.className = "";
+        return;
+      }
+
+      if (type === "error") {
+        messageDiv.className = "tag-error";
+      } else {
+        messageDiv.className = "tag-success";
+      }
       messageDiv.textContent = text;
-      messageDiv.className = type === "error" ? "error" : "success";
     }
 
     function clearMessage() {
-      messageDiv.textContent = "";
-      messageDiv.className = "";
+      showMessage("");
     }
 
     async function loadItems() {
       clearMessage();
-      itemsTableBody.innerHTML = "<tr><td colspan='7'>Loading...</td></tr>";
+      itemsTableBody.innerHTML = "<tr><td colspan=\"7\">Loading...</td></tr>";
 
       try {
-        const res = await fetch(`${BASE_URL}/item`, {
-          method: "GET"
-        });
+        const res = await fetch(BASE_URL + "/item", { method: "GET" });
 
         if (!res.ok) {
-          throw new Error(`Request failed with status ${res.status}`);
+          throw new Error("Request failed with status " + res.status);
         }
 
-        const data = await res.json(); 
+        const data = await res.json();
+
         if (!Array.isArray(data)) {
           throw new Error("Unexpected response format (not an array)");
         }
 
         if (data.length === 0) {
-          itemsTableBody.innerHTML = "<tr><td colspan='7'>No items found.</td></tr>";
+          itemsTableBody.innerHTML = "<tr><td colspan=\"7\">No items found.</td></tr>";
           return;
         }
 
         itemsTableBody.innerHTML = "";
-        data.forEach(item => {
+
+        data.forEach(function (item) {
           const tr = document.createElement("tr");
 
-          tr.innerHTML = `
-            <td>${item.item_id}</td>
-            <td>${item.item_name}</td>
-            <td>${item.item_description}</td>
-            <td>${item.item_qty_on_hand}</td>
-            <td>${item.item_price}</td>
-            <td>${item.location_id}</td>
-            <td>
-              <button data-id="${item.item_id}">Delete</button>
-            </td>
-          `;
+          tr.innerHTML =
+            "<td>" + item.item_id + "</td>" +
+            "<td>" + item.item_name + "</td>" +
+            "<td>" + item.item_description + "</td>" +
+            "<td>" + item.item_qty_on_hand + "</td>" +
+            "<td>" + item.item_price + "</td>" +
+            "<td>" + item.location_id + "</td>" +
+            "<td class=\"actions\">" +
+              "<button class=\"btn-danger\" data-id=\"" + item.item_id + "\">Delete</button>" +
+            "</td>";
 
           const deleteBtn = tr.querySelector("button");
-          deleteBtn.addEventListener("click", () => {
-            if (confirm(`Delete item ${item.item_id}?`)) {
+          deleteBtn.addEventListener("click", function () {
+            const ok = confirm("Delete item " + item.item_id + "?");
+            if (ok) {
               deleteItem(item.item_id);
             }
           });
 
           itemsTableBody.appendChild(tr);
         });
-
       } catch (err) {
         console.error(err);
-        itemsTableBody.innerHTML = "<tr><td colspan='7'>Error loading items.</td></tr>";
+        itemsTableBody.innerHTML = "<tr><td colspan=\"7\">Error loading items.</td></tr>";
         showMessage(err.message || "Error loading items", "error");
       }
     }
@@ -197,16 +527,16 @@
       clearMessage();
 
       try {
-        const res = await fetch(`${BASE_URL}/item/${encodeURIComponent(itemId)}`, {
+        const res = await fetch(BASE_URL + "/item/" + encodeURIComponent(itemId), {
           method: "DELETE"
         });
 
         if (!res.ok) {
-          throw new Error(`Delete failed with status ${res.status}`);
+          throw new Error("Delete failed with status " + res.status);
         }
 
-        const data = await res.json(); // {"message": "...", "item": {...}}
-        showMessage(data.message || `Item ${itemId} deleted`);
+        const data = await res.json();
+        showMessage(data.message || "Item " + itemId + " deleted", "success");
         await loadItems();
       } catch (err) {
         console.error(err);
@@ -214,7 +544,7 @@
       }
     }
 
-    addForm.addEventListener("submit", async (event) => {
+    addForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       clearMessage();
 
@@ -229,21 +559,25 @@
         return;
       }
 
-      if (Number.isNaN(item_qty_on_hand) || Number.isNaN(item_price) || Number.isNaN(location_id)) {
+      if (
+        isNaN(item_qty_on_hand) ||
+        isNaN(item_price) ||
+        isNaN(location_id)
+      ) {
         showMessage("Quantity, price and location must be numbers.", "error");
         return;
       }
 
       const payload = {
-        item_name,
-        item_description,
-        item_qty_on_hand,
-        item_price,
-        location_id
+        item_name: item_name,
+        item_description: item_description,
+        item_qty_on_hand: item_qty_on_hand,
+        item_price: item_price,
+        location_id: location_id
       };
 
       try {
-        const res = await fetch(`${BASE_URL}/item`, {
+        const res = await fetch(BASE_URL + "/item", {
           method: "POST",
           headers: {
             "Content-Type": "application/json"
@@ -252,11 +586,11 @@
         });
 
         if (!res.ok) {
-          throw new Error(`Create failed with status ${res.status}`);
+          throw new Error("Create failed with status " + res.status);
         }
 
-        const data = await res.json(); 
-        showMessage(`Item created with id ${data.item_id || "(unknown id)"}`);
+        const data = await res.json();
+        showMessage("Item created with id " + (data.item_id || "(unknown id)"), "success");
 
         addForm.reset();
         await loadItems();
