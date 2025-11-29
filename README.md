@@ -10,6 +10,14 @@ An small inventory system using:
 
 ---
 
+## Live demo
+
+You can view the demo website here (hosted on S3):
+
+**https://inventoryapp-yunfei-2025.s3.us-east-1.amazonaws.com/index.html**
+
+---
+
 ## Features
 
 Inventory items have:
