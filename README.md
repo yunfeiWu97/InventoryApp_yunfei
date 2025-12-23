@@ -12,10 +12,7 @@ An small inventory system using:
 
 ## Live demo
 
-You can view the demo website here (hosted on S3):
-
-**https://inventoryapp-yunfei-2025.s3.us-east-1.amazonaws.com/index.html**
-
+The live website can't be accessed because my course has ended and is no longer accessible o(╥﹏╥)o
 ---
 
 ## Features
