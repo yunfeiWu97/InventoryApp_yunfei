@@ -11,6 +11,7 @@ An small inventory system using:
 ---
 
 ## Live demo
+<img width="1331" height="869" alt="Weixin Image_2025-11-29_144700_305" src="https://github.com/user-attachments/assets/119d847f-45ca-407b-aa5d-1c82cc9bdb91" />
 
 The live website can't be accessed because my course has ended and is no longer accessible o(╥﹏╥)o
 ---
